@@ -1,11 +1,37 @@
 <?php
 // creo que funciona igual que include
 require "config/database.php";
+require "config/config.php";
 $db = new Database();
 $con = $db->conectar();
 
 $id = isset($_GET["id"]) ? $_GET["id"] : "";
 $token = isset($_GET["token"]) ? $_GET["token"] : "";
+
+if ($id == "" || $token == "") {
+  echo "error al procesar la peticion";
+  exit;
+} else {
+  $token_tmp = hash_hmac("sha1", $id, KEY_TOKEN);
+
+  if ($token == $token_tmp) {
+    $sql = $con->prepare("SELECT count(id) FROM productos WHERE id=? AND activo=1");
+    // con el ? se hace el filtrado por separacion con PDO
+    $sql->execute([$id]);
+    if ($sql->fetchColumn() > 0) {
+
+      $sql = $con->prepare("SELECT nombre, descripcion, precio FROM productos WHERE id=? AND activo=1 LIMIT 1");
+      $sql->execute([$id]);
+      $row = $sql->fetch(PDO::FETCH_ASSOC);
+      $nombre = $row["nombre"];
+      $descripcion = $row["descripcion"];
+      $precio = $row["precio"];
+    }
+  } else {
+    echo "error al procesar la peticion";
+    exit;
+  }
+}
 
 $sql = $con->prepare("SELECT id, nombre, descripcion, precio FROM productos WHERE activo=1");
 $sql->execute();
@@ -19,38 +45,51 @@ $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>E-commerce Website</title>
-    <link href="./output.css" rel="stylesheet" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E-commerce Website</title>
+  <link href="./output.css" rel="stylesheet" />
 </head>
 
 <body class="bg-gray-100">
-    <header class="bg-white shadow-md">
-        <div
-            class="container mx-auto px-4 py-6 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-800">E-commerce Store</h1>
-            <nav>
-                <ul class="flex space-x-6">
-                    <li>
-                        <a href="carrito.php">
-                            <button
-                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-                                Carrito
-                            </button></a>
-                    </li>
-                </ul>
-            </nav>
+  <header class="bg-white shadow-md">
+    <div
+      class="container mx-auto px-4 py-6 flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-gray-800">E-commerce Store</h1>
+      <nav>
+        <ul class="flex space-x-6">
+          <li>
+            <a href="carrito.php">
+              <button
+                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                Carrito
+              </button></a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2">
+      <div class="">
+        <img src="./img/producto/1/image.png" alt="image" class="w-full max-w-md object-cover">
+      </div>
+      <div class="">
+        <h2 class=""><?= $nombre ?></h2>
+        <h2><?= MONEDA . number_format($precio, 2, ".", ",") ?></h2>
+        <p><?= $descripcion ?></p>
+        <div class="grid grid-cols-5 gap-7">
+          <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" type="button">Comprar ahora</button>
+          <button class="bg-white hover:bg-gray-600 px-4 py-2 rounded" type="button">Agregar al carrito ahora</button>
         </div>
-    </header>
+      </div>
+    </div>
+  </main>
 
-    <main class="container mx-auto px-4 py-8">
+  <div id="paypal-button-container"></div>
 
-    </main>
-
-    <div id="paypal-button-container"></div>
-
-    <!-- <footer class="bg-gray-800 text-white py-8">
+  <!-- <footer class="bg-gray-800 text-white py-8">
       <div class="container mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
