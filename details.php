@@ -39,13 +39,16 @@ if ($id == "" || $token == "") {
       }
 
       $imagenes = array();
-      $dir = dir($dir_images);
+      if (file_exists($dir_images)) {
+        $dir = dir($dir_images);
 
-      // con esto traemos las imagenes
-      while (($archivo = $dir->read()) != false) {
-        if ($archivo != "image.png" && (strpos($archivo, "png") || strpos($archivo, "jpg"))) {
-          $imagenes[] = $dir_images . $archivo;
+        // con esto traemos las imagenes
+        while (($archivo = $dir->read()) != false) {
+          if ($archivo != "image.png" && (strpos($archivo, "png") || strpos($archivo, "jpg"))) {
+            $imagenes[] = $dir_images . $archivo;
+          }
         }
+        $dir->close();
       }
     }
   } else {
@@ -128,7 +131,7 @@ if ($id == "" || $token == "") {
         <p><?= $descripcion ?></p>
         <div class="flex justify-center md:justify-start">
           <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" type="button">Comprar ahora</button>
-          <button class="bg-white hover:bg-slate-300 px-4 py-2 rounded" type="button">Agregar al carrito ahora</button>
+          <button class="bg-white hover:bg-slate-300 px-4 py-2 rounded" type="button" onclick="addProducto(<?= $id; ?>, '<?= $token_tmp; ?>')">Agregar al carrito ahora</button>
         </div>
       </div>
     </div>
@@ -171,7 +174,7 @@ if ($id == "" || $token == "") {
 
   <!-- bootstrap -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
-
+  <script src="./script.js"></script>
 </body>
 
 </html>

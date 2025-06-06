@@ -133,6 +133,7 @@ $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
       </div>
     </footer> -->
 
+    <script src="./script.js"></script>
 
 </body>
 
