@@ -12,6 +12,8 @@ $sql->execute();
 // estamos diciendo que me lo traiga por nombre de columnas
 $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
 
+// session_destroy();
+
 ?>
 
 <!DOCTYPE html>
@@ -35,7 +37,7 @@ $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
                         <a href="carrito.php">
                             <button
                                 class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-                                Carrito
+                                Carrito <span id="num_cart" class="badge bg-secondary"><?= $num_cart; ?></span>
                             </button></a>
                     </li>
                 </ul>
@@ -77,10 +79,7 @@ $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
                                              El key_token es lo que tenemos en config.php -->
                                         Detalles
                                     </a>
-                                    <a
-                                        class="bg-cyan-500 hover:bg-cyan-600  text-white px-4 py-2 rounded">
-                                        Add to Cart
-                                    </a>
+                                    <button class="bg-white hover:bg-slate-300 px-4 py-2 rounded" type="button" onclick="addProducto(<?= $row['id']; ?>, '<?= hash_hmac('sha1', $row['id'], KEY_TOKEN); ?>')">Agregar al carrito ahora</button>
 
                                 </div>
                             </div>
@@ -133,7 +132,33 @@ $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
       </div>
     </footer> -->
 
-    <script src="./script.js"></script>
+    <script>
+        const {
+            json
+        } = require("express");
+
+        function addProducto(id, token) {
+            let url = "clases/carrito.php";
+            let formData = new FormData();
+
+            formData.append("id", id);
+            formData.append("token", token);
+
+            // enviamos los datos mediante post
+            fetch(url, {
+                    method: "POST",
+                    body: formData,
+                    mode: "cors",
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.ok) {
+                        let elemento = document.getElementById("num_cart");
+                        elemento.innerHTML = data.numero;
+                    }
+                });
+        }
+    </script>
 
 </body>
 

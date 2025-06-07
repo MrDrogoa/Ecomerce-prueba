@@ -83,7 +83,7 @@ if ($id == "" || $token == "") {
             <a href="carrito.php">
               <button
                 class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-                Carrito
+                Carrito <span id="num_cart" class="badge bg-secondary"><?= $num_cart; ?></span>
               </button></a>
           </li>
         </ul>
@@ -173,8 +173,34 @@ if ($id == "" || $token == "") {
     </footer> -->
 
   <!-- bootstrap -->
+  <script>
+    const {
+      json
+    } = require("express");
+
+    function addProducto(id, token) {
+      let url = "clases/carrito.php";
+      let formData = new FormData();
+
+      formData.append("id", id);
+      formData.append("token", token);
+
+      // enviamos los datos mediante post
+      fetch(url, {
+          method: "POST",
+          body: formData,
+          mode: "cors",
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.ok) {
+            let elemento = document.getElementById("num_cart");
+            elemento.innerHTML = data.numero;
+          }
+        });
+    }
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
-  <script src="./script.js"></script>
 </body>
 
 </html>

@@ -15,9 +15,14 @@ if (isset($_POST['id'])) {
             // el id es el que recibimos del producto
             $_SESSION['carrito']['productos'][$id] = 1;
         }
+
+        $datos['numero'] = count($_SESSION['carrito']['productos']);
+        $datos['ok'] = true;
     } else {
         $datos['ok'] = false;
     }
 } else {
     $datos['ok'] = false;
 };
+
+echo json_encode($datos);
